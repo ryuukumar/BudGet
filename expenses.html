@@ -1,0 +1,193 @@
+<html>
+    <head>
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="Expires" content="0"/>
+        <title>Expense monitor</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inconsolata">
+        <link rel="stylesheet" href="website/stylesheet.css">
+    </head>
+    <body>
+        <div class="body" id="mainbody">
+        <div class="body-inside">
+        <center class="maincontent" style="scroll-snap-type: mandatory;">
+            <div class="head-stats">
+                <div class="maincunt">
+                    <span id="month" class="maincunt">Month</span> expenses: &#8377;<span id="month-expense" class="maincunt-number">0.00</span> of
+                    &#8377;<span id="monthTarget" class="maincunt">0.00</span>
+                </div>
+                <div class="maincunt">
+                    Daily expense target: &#8377;<span id="dailyTarget" class="maincunt">0.00</span>
+                    <div id="caution">
+
+                    </div>
+                </div>
+            </div>
+            <br><br>
+            <div class="calendar" id="calendar">
+                ...
+            </div>
+            <span class="br"></span>
+            <div style="scroll-snap-align: middle;">
+                <span class="morebrpad"></span>
+                <span style="font-size:80px">You have spent <span class="yearamtwrapper">&#8377;<span class="countup" id="yearspend" style="font-size:80px">0</span></span> this year.</span><br><br>
+                <span style="font-size:30px" class="yearcomment">And saved an ungodly amount! 🎉</span>
+                <span class="morebrpad"></span>
+            </div>
+            <div class="exptablebg">
+                <span style="font-size:35px;">Expenses by Month</span>
+                <div class="expensetable" id="tablehere">
+                    ...
+                </div>
+            </div>
+            <span class="morebrpad"></span>
+        </center>
+        <div class="guide">
+            <h3 style="font-size: 30px">How this expense monitor works</h3>
+            <p>
+                Daily spendings are sent to the Telegram interface, and susbequently logged by the 
+                backend. This webpage then reads the logs and calculates daily, weekly and monthly
+                spendings. If a monthly target is set, it also calculates spending targets for the
+                remaining days.
+            </p>
+            <p>
+                Monthly spending targets can be set by issuing the command c pref advmonthly [amount]
+                to the Telegram chat or to the script in shell mode.
+            </p>
+            <p>
+                Weekly targets are internally set by multiple criteria.
+                <ul>
+                    <li>
+                        For weeks before the present date, the spending target is given directly 
+                        by the proportional daily spending targets taken from the monthly spending
+                        target.
+                    </li>
+                    <li>
+                        For the current week, the target is given by adding the remainingDailyLimit
+                        calculated property for all the days in the week after the present day
+                        including the present day. Further, the amount spent in the previous
+                        days is added to this target. This leads to the target basically allowing
+                        for spendings proportional to the remaining balance.
+                    </li>
+                    <li>
+                        For future weeks, the weekly target is not calculated.
+                    </li>
+                </ul>
+            </p>
+            <p>
+                Daily limits are of two types:
+                <ul>
+                    <li>
+                        <b>Direct daily limit:</b> the daily limit given by dividing the
+                        advisableMonthlySpendings property by the number of days in the week. It
+                        represents an ideal amount of money spent every day for the total to exactly
+                        equal our monthly target.
+                    </li>
+                    <li>
+                        <b>remainingDailyLimit:</b> the daily limiy given as a result of the tally
+                        of all previous spendings. It splits the remaining balance by the number of
+                        days left in the month and accordingly sets the daily target such that if it
+                        is followed, the total will not exceed the monthly target.
+                    </li>
+                </ul>
+            </p>
+        </div><br>
+        <div class="guide">
+            <h3 style="font-size: 30px">Commands tutorial</h3>
+            <p>
+                Commands are a feature introduced in v1.0.2 to simplify the process of modifying some
+                parameters and preferences. These can be executed presently in two different ways:
+                <ul>
+                    <li>
+                        <b>Via Telegram:</b> You can issue commands to the Telegram bot exactly how
+                        you usually send your expenses.
+                    </li>
+                    <li>
+                        <b>Via shell:</b> Involves running the Telegram bot in shell mode so that commands
+                        are processed instantly. This is usually preferred as it is quicker.
+                    </li>
+                </ul>
+            </p>
+            <p>
+                It is recommended you use the shell. However, it is possible to run commands via Telegram.
+            </p>
+            <p>
+                To start the shell, navigate to the directory in which you installed the BudGet software
+                (it should be the same directory that this webpage is in) and open a Terminal there. Next,
+                type the following:
+                <div class="code">
+                    .\budget.ps1 shellmode
+                </div>
+                The BudGet app will open in shell mode and will now allow you to execute commands.
+            </p>
+            <p>
+                The commands are typed in exactly the same way in both methods, except for a prefix 'c'
+                which is used in the Telegram message bot. Such that this:
+                <div class="code">
+                    pref advmonthly 15000
+                </div>
+                becomes this:
+                <div class="code">
+                    c pref advmonthly 15000
+                </div>
+            </p>
+            <p>
+                The simplest command to use is<span class="code-inline">help</span>. This gives you a list of commands that can be used.
+            </p>
+            <p>
+                Here are some possible use cases.
+            </p>
+            <p>
+                Consider having to add an entry into some previous day which you forgot to add while paying for it. You can use the <span class="code-inline">insert</span> command like so:
+                <div class="code">
+                    insert yesterday 5:00PM 57 cake
+                </div>
+                This would add an entry for yesterday at 5PM, where you spent 57 rupees on cake. You can also type <span class="code-inline">insert yesterday - 57 cake</span> to set the entry for midday, or <span class="code-inline">insert - 5:00AM 57 cake</span> to set the entry to today. To set entries for any other day, type <span class="code-inline">insert 5/13/23 5:00PM 57 cake</span>. Note that the date must be entered in the same format as is visible on the taskbar (i.e. if your date is in the European format, type 13/5/23 instead).
+            </p>
+            <p>
+                Another handy command is <span class="code-inline">del</span>, which allows you to delete entries. As of now, this only works on the Telegram bot. To use it, navigate to the message which you wish to remove from records, and reply to it with
+                <div class="code">
+                    c del
+                </div>
+                This will delete the entry upon the next refresh of the BudGet bot.
+            </p>
+            <p>
+                <b>IMPORTANT:</b> If you're in shell mode, remember to always quit with
+                <div class="code">
+                    exit
+                </div>
+                This will save the changes you have made. If you do not exit via this method, <u>your changes will not be saved</u>!!
+            </p>
+        </div><br>
+        <div class="guide">
+            <h1 style="font-size: 40px">BudGet v1.0.3</h1>
+            <p style="font-size: 15px">&#169; Aditya Kumar 2023<br>Some rights reserved.</p>
+        </div>
+        </div>
+        </div>
+
+        <script type="text/javascript" src="curated.json"></script>
+        <script type="text/javascript" src="website/countup.js"></script>
+        <script>
+            function startListen () {
+                var coll = document.getElementsByClassName("collapse");
+                var i;
+
+                for (i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight){
+                    content.style.maxHeight = null;
+                    } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    } 
+                });
+                }
+            }
+        </script>
+        <script type="text/javascript" src="website/parse.js"></script>
+    </body>
+</html>

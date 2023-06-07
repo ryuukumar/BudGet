@@ -1,0 +1,8 @@
+backups
+bg
+expenses
+releases
+*.txt
+*.log
+*.json
+weekreport.ps1
